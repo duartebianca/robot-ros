@@ -36,7 +36,7 @@ ENCODER = {
 # Parâmetros do robô
 ROBOT = {
     'WHEEL_RADIUS': 0.03,   # Raio da roda em metros
-    'HALF_AXLE_LENGTH': 0.075, # Metade da distância entre as rodas em metros
+    'HALF_AXLE_LENGTH': 0.0335, # Metade da distância entre as rodas em metros
     'ENCODER_PPR': 11,      # Pulsos por revolução do encoder
     'PWM_FREQUENCY': 100,   # Frequência PWM em Hz
     'CONTROL_RATE': 10      # Taxa de controle em Hz (10 = 100ms)
