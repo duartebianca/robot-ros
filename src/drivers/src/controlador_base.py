@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 ControladorBase - Controlador para robô diferencial com ROS.
 Implementa um controlador PID para controle de velocidade baseado em encoders.
@@ -10,7 +11,7 @@ from geometry_msgs.msg import Twist
 
 # Constantes e configurações do sistema
 # -------------------------------------------------
-# Configuração da ponte H
+# Configuração da ponte H (controle dos motores)
 H_BRIDGE = {
     'CONECTOR1': 5,  # gpio 5, porta 29
     'CONECTOR2': 6,  # gpio 6, porta 31
@@ -20,19 +21,7 @@ H_BRIDGE = {
     'ENB': 12,       # gpio 12, porta 32
 }
 
-# Configuração dos motores e encoders
-MOTOR = {
-    'LEFT': {
-        'GREEN': 11,  # GPIO 17
-        'YELLOW': 13, # GPIO 27
-    },
-    'RIGHT': {
-        'GREEN': 16,  # GPIO 23
-        'YELLOW': 18, # GPIO 24
-    }
-}
-
-# Configuração dos encoders
+# Configuração dos encoders (sensores de velocidade)
 ENCODER = {
     'LEFT': {
         'GREEN': 17,  # GPIO 17, porta 11
@@ -307,11 +296,13 @@ def init_gpio():
     """Inicializa o sistema GPIO"""
     GPIO.setmode(GPIO.BCM)
     
-    # Configura pinos dos motores como saída
-    GPIO.setup(MOTOR['LEFT']['GREEN'], GPIO.OUT)
-    GPIO.setup(MOTOR['LEFT']['YELLOW'], GPIO.OUT)
-    GPIO.setup(MOTOR['RIGHT']['GREEN'], GPIO.OUT)
-    GPIO.setup(MOTOR['RIGHT']['YELLOW'], GPIO.OUT)
+    # Configura pinos da ponte H como saída
+    GPIO.setup(H_BRIDGE['CONECTOR1'], GPIO.OUT)
+    GPIO.setup(H_BRIDGE['CONECTOR2'], GPIO.OUT)
+    GPIO.setup(H_BRIDGE['CONECTOR3'], GPIO.OUT)
+    GPIO.setup(H_BRIDGE['CONECTOR4'], GPIO.OUT)
+    GPIO.setup(H_BRIDGE['ENA'], GPIO.OUT)
+    GPIO.setup(H_BRIDGE['ENB'], GPIO.OUT)
     
     # Configura pinos dos encoders como entrada com pull-up
     GPIO.setup(ENCODER['LEFT']['GREEN'], GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -371,7 +362,7 @@ def main():
         # Para os motores e limpa GPIO
         try:
             controller.motor_controller.cleanup()
-        except Exception:
+        except:
             pass
         GPIO.cleanup()
         rospy.loginfo("Recursos liberados e GPIO limpo")
