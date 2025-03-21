@@ -1,0 +1,2217 @@
+                           Robot Operating System
+
+                          Universidade Federal de Pernambuco
+                               Adrien Durand-Petiteville
+                         adrien.durandpetiteville@ufpe.br
+
+
+
+
+Robot Operating System                                         1 / 144
+Robot Operating System
+
+
+
+
+ • O Robot Operating System (ROS) é uma estrutura para escrever software de robô.
+ • É uma coleção de ferramentas, bibliotecas e convenções que visam simplificar a
+   tarefa de criar comportamento robótico complexo e robusto em uma ampla
+   variedade de plataformas robóticas.
+
+
+
+
+   Robot Operating System                                                           2 / 144
+Exemplo - 1
+
+ • Considere uma tarefa simples de ”buscar um item”, na qual um robô é instruı́do a
+   recuperar um grampeador.
+ • Primeiro, o robô deve entender a solicitação, verbalmente ou através de alguma outra
+   modalidade, como interface da web, email ou até SMS.
+ • Em seguida, o robô deve iniciar algum tipo de planejador para coordenar a pesquisa
+   do item, o que provavelmente exigirá a navegação por várias salas de um edifı́cio,
+   talvez incluindo elevadores e portas.
+ • Ao chegar a uma sala, o robô deve procurar em mesas repletas de objetos de tamanho
+   semelhante (já que todos os objetos portáteis têm aproximadamente o mesmo
+   tamanho) e encontrar um grampeador.
+ • O robô deve então refazer suas etapas e entregar o grampeador no local desejado.
+ • Cada um desses subproblemas pode ter números arbitrários de fatores complicadores.
+
+   Robot Operating System                                                              3 / 144
+Exemplo - 2
+
+
+ • ROS foi construı́do desde o inı́cio para incentivar o desenvolvimento de software de
+   robótica colaborativa.
+     • Uma organização pode ter especialistas em mapeamento de ambientes internos e
+       contribuir com um sistema complexo e fácil de usar para a produção de mapas internos.
+     • Outro grupo pode ter experiência no uso de mapas para navegar de maneira robusta em
+       ambientes internos.
+     • Ainda outro grupo pode ter descoberto uma abordagem de visão computacional
+       especı́fica que funciona bem para reconhecer pequenos objetos desorganizados.
+ • ROS inclui muitos recursos projetados especificamente para simplificar esse tipo de
+   colaboração em larga escala.
+
+
+
+
+   Robot Operating System                                                                   4 / 144
+Filosofia - 1
+
+
+
+  • Peer To Peer
+      • Os sistemas ROS consistem em vários pequenos programas de computador que se
+        conectam e trocam mensagens continuamente.
+      • Essas mensagens viajam diretamente de um programa para outro; não há serviço de
+        roteamento central.
+  • Baseado em ferramentas
+      • Sistemas de software complexos podem ser criados a partir de muitos programas
+        pequenos e genéricos.
+      • As tarefas são executadas por programas separados:
+            •   Navegar na árvore do código-fonte
+            •   Visualizar as interconexões do sistema
+            •   Plotar graficamente fluxos de dados
+            •   Gerar documentação
+            •   Registrar dados
+    Robot Operating System                                                                   5 / 144
+Filosofia - 2
+  • Multilı́ngue
+      • Muitas tarefas de software são mais fáceis de realizar em linguagens de script de ”alta
+        produtividade”, como Python ou Ruby.
+      • No entanto, há momentos em que os requisitos de desempenho determinam o uso de
+        linguagens mais rápidas, como C++.
+      • Os módulos do software ROS podem ser escritos em qualquer idioma para o qual uma
+        biblioteca cliente foi gravada.
+      • No momento existem bibliotecas cliente para C++, Python, LISP, Java, JavaScript,
+        MATLAB, Ruby, Haskell, R, Julia...
+  • Fino
+      • As convenções de ROS incentivam os colaboradores a criar bibliotecas independentes e,
+        em seguida, agrupar essas bibliotecas para que possam enviar e receber mensagens para
+        e de outros módulos do ROS.
+      • Essa camada extra destina-se a permitir a reutilização de software fora do ROS para
+        outras aplicações
+  • Fonte livre e aberta
+      • O núcleo do ROS é liberado sob a licença permissiva BSD, que permite o uso comercial e
+        não comercial.
+    Robot Operating System                                                                      6 / 144
+                         Conceitos Chaves
+
+
+
+
+Robot Operating System                      7 / 144
+ROS Graph - 1
+
+
+ • Um sistema ROS é composto de muitos programas diferentes, executando
+   simultaneamente e se comunicando, transmitindo mensagens.
+ • É conveniente usar um gráfico matemático para representar essa coleção de
+   programas e mensagens:
+     •   Os programas são os nós do gráfico.
+     •   Os programas que se comunicam entre si são conectados por arestas.
+     •   Um nó representa um módulo de software que está enviando ou recebendo mensagens.
+     •   Uma aresta representa um fluxo de mensagens entre dois nós.
+ • O maior benefı́cio de uma arquitetura baseada em gráficos é a capacidade de
+   prototipar sistemas complexos com pouca ou nenhuma ”cola”de software necessária
+   para a experimentação.
+
+
+
+   Robot Operating System                                                                  8 / 144
+ROS Graph - 2
+
+
+
+
+   Robot Operating System   9 / 144
+roscore - 1
+
+
+  • O roscore é um serviço que fornece informações de conexão aos nós para que eles
+    possam transmitir mensagens entre si.
+  • Cada nó se conecta ao roscore na inicialização para registrar detalhes dos fluxos de
+    mensagens que publica e dos fluxos nos quais deseja assinar.
+  • Quando um novo nó aparece, o roscore fornece as informações necessárias para formar
+    uma conexão direta ponto a ponto com outros nós que publicam e assinam os mesmos
+    tópicos de mensagem.
+  • Todo sistema ROS precisa de um roscore em execução, pois sem ele, os nós não
+    podem encontrar outros nós.
+
+
+
+
+    Robot Operating System                                                             10 / 144
+roscore - 2
+
+
+  • Quando um nó ROS é iniciado, ele espera que seu processo tenha uma variável de
+    ambiente chamada ROS MASTER URI.
+  • Com o conhecimento da localização do roscore na rede, os nós se registram na
+    inicialização com o roscore e consultam o roscore para encontrar outros nós e fluxos
+    de dados por nome.
+  • Cada nó do ROS informa ao roscore quais mensagens ele fornece e quais gostaria de
+    assinar.
+  • O roscore fornece os endereços dos produtores e consumidores de mensagens
+    relevantes.
+
+
+
+
+    Robot Operating System                                                              11 / 144
+roscore - 3
+
+  • Visualizados em forma de gráfico, cada nó no gráfico pode periodicamente chamar os
+    serviços fornecidos pela roscore para encontrar seus pares (linhas tracejadas).
+
+
+
+
+  • O roscore também fornece um servidor de parâmetros, usado extensivamente pelos
+    nós do ROS para configuração.
+  • O servidor de parâmetros permite que os nós armazenem e recuperem estruturas de
+    dados arbitrárias, como descrições de robôs, parâmetros para algoritmos e assim por
+    diante.
+     Robot Operating System                                                              12 / 144
+catkin
+
+
+
+  • catkin é o sistema de criação do ROS: o conjunto de ferramentas que o ROS usa para
+    gerar programas executáveis, bibliotecas, scripts e interfaces que outro código pode
+    usar.
+  • O catkin inclui um conjunto de macros do CMake e scripts Python personalizados
+    para fornecer funcionalidade extra sobre o fluxo de trabalho normal do CMake.
+  • Existem dois arquivos, CMakeLists.txt e package.xml, aos quais vocês precisam
+    adicionar algumas informações especı́ficas para que as coisas funcionem corretamente.
+
+
+
+
+    Robot Operating System                                                             13 / 144
+Workspaces - 1
+
+
+
+  • Antes de começar a escrever qualquer código ROS, é necessário configurar uma área
+    de trabalho para a permanência desse código.
+  • Uma área de trabalho é simplesmente um conjunto de diretórios nos quais vive um
+    conjunto relacionado de códigos ROS.
+  • Vocês podem ter vários espaços de trabalho do ROS, mas só pode trabalhar em um
+    deles a qualquer momento.
+  • A maneira mais simples de pensar sobre isso é que vocês só podem ver o código que
+    vive no seu espaço de trabalho atual.
+
+
+
+
+    Robot Operating System                                                             14 / 144
+Workspaces - 2
+
+
+  • Como criar um espaço de trabalho de catkin e inicializá-lo:
+
+    $ mkdir -p ~/catkin ws/src
+    $ cd ~/catkin ws/src
+    $ catkin init workspace
+
+  • Isso cria um diretório da área de trabalho chamado catkin ws (embora você possa
+    chamá-lo como quiser), com um diretório src dentro para o seu código.
+  • O comando catkin init workspace cria um arquivo CMakeLists.txt no diretório src.
+
+
+
+
+    Robot Operating System                                                        15 / 144
+Workspaces - 3
+  • Como criar alguns outros arquivos da área de trabalho:
+
+    $ cd ~/catkin ws
+    $ catkin make
+  • A execução de catkin make gerará muita saı́da.
+  • Quando terminar, você terminará com dois novos diretórios: build e devel.
+      • build é onde o catkin armazena os resultados de alguns de seus trabalhos, como
+        bibliotecas e programas executáveis (C++).
+      • O devel contém vários arquivos e diretórios, sendo os mais interessantes os arquivos de
+        instalação. A execução dessas configurações configura o sistema para usar esse espaço de
+        trabalho e o código contido nele.
+
+    $ source devel/setup.bash
+
+  • Para cada novo terminal, você precisa originar o arquivo setup.bash para o espaço de
+    trabalho com o qual deseja trabalhar.
+    Robot Operating System                                                                        16 / 144
+ROS Packages - 1
+
+
+
+ • O software ROS é organizado em pacotes, cada um dos quais contém alguma
+   combinação de código, dados e documentação.
+ • O ecossistema ROS inclui milhares de pacotes publicamente disponı́veis em
+   repositórios abertos.
+ • Os pacotes ficam dentro das áreas de trabalho, no diretório src.
+ • Cada diretório do pacote deve incluir um arquivo CMakeLists.txt e um arquivo
+   package.xml que descreve o conteúdo do pacote e como o catkin deve interagir com
+   ele.
+
+
+
+
+   Robot Operating System                                                         17 / 144
+ROS Packages - 2
+
+ • Como criar um novo pacote:
+
+   $ cd ~/catkin ws/src
+   $ catkin create pkg my awesome code rospy
+
+ • catkin create pkg cria o novo pacote chamado my awesome code, que depende do
+   pacote rospy.
+ • Se o novo pacote depender de outros pacotes existentes, liste-os na linha de comando.
+ • O comando catkin create pkg cria um diretório com o mesmo nome que o novo
+   pacote com um arquivo CMakeLists.txt, um arquivo package.xml e um diretório
+   src.
+ • Depois de criar um pacote, vocês podem colocar seus nós Python no diretório src.
+Example of package.xml
+
+    Robot Operating System                                                           18 / 144
+Ferramentas do sistema de arquivos
+
+
+  • rospack permite que você obtenha informações sobre pacotes
+
+    $ rospack find [package name]
+
+  • roscd permite que você mude diretamente para o diretório de um pacote
+
+    $ roscd <package>[/subdir]
+
+  • rosls permite que você ls diretamente em um pacote por nome
+
+    $ rosls <package>[/subdir]
+
+
+
+
+    Robot Operating System                                                    19 / 144
+rosrun
+
+
+
+
+  • rosrun procura em um pacote o programa solicitado e passa a ele todos os
+    parâmetros fornecidos na linha de comando.
+  • A sintaxe é a seguinte:
+
+    $ rosrun PACKAGE EXECUTABLE [ARGS]
+
+
+
+
+    Robot Operating System                                                     20 / 144
+Exemplo - 1
+ • Por exemplo, queremos executar o programa talker do pacote rospy tutorials
+   localizado em /opt/ros/melodic/share/rospy tutorials.
+ • Em terminal 1, inicie uma instância do roscore
+
+   $ roscore
+
+ • Em terminal 2, inicie uma instância do ROS graph
+
+   $ rqt graph
+
+ • Em terminal 3, execute:
+
+   $ rosrun rospy tutorials talker
+
+ • Atualize o ROS graph.
+   Robot Operating System                                                       21 / 144
+Exemplo - 2
+ • Em terminal 4, execute:
+
+   $ rostopic list
+   $ rostopic echo [completar]
+   $ rostopic info [completar]
+
+ • Em terminal 5, execute:
+
+   $ rosrun rospy tutorials listener
+
+ • Atualize o ROS graph.
+ • Em terminal 4, execute:
+
+   $ rostopic info [completar]
+   Robot Operating System              22 / 144
+                         Node
+
+
+
+
+Robot Operating System          23 / 144
+Criação de um nó
+
+
+
+
+  • Os sistemas ROS consistem em vários nós independentes que compõem um gráfico.
+  • Criação de um nó:
+      • cd workspace/src/package/src/: mover para o diretório do package
+      • Criar um arquivo arquivoNo.py
+      • sudo chmod +x arquivoNo.py: autorizar a execução do arquivo
+  • Exemplo: 01 node.py
+
+
+
+
+    Robot Operating System                                                         24 / 144
+1   # ! / usr / bin / python3
+2
+
+3   # Importaç~
+               a o do modulo ROS para Python
+4   import rospy
+5
+
+6   # Criaç~a o do nó com o nome hello_world
+7   rospy . init_node ( ’ hello_world ’)
+8
+
+9   print ( " Hello world " )
+
+
+
+
+        Robot Operating System                   25 / 144
+Criação de um nó- 2
+
+
+    $ #!/usr/bin/python
+
+  • É conhecido como o shebang. Ele permite que o sistema operacional saiba que esse é
+    um arquivo Python e que deve ser passado para o intérprete Python.
+
+    $ import rospy
+
+  • Aparece em todos os nós do ROS Python e importa toda a funcionalidade básica
+
+    $ rospy.init node(’hello world’)
+
+  • Inicialize o nó.
+
+
+     Robot Operating System                                                          26 / 144
+ 1   # ! / usr / bin / python
+ 2
+
+ 3   import rospy
+ 4
+
+ 5   rospy . init_node ( ’ hello_world ’)
+ 6
+
+ 7   # Definiç~
+               a o da frequ^ e ncia do laço while
+ 8   rate = rospy . Rate (2)
+ 9
+
+10   count = 0
+11   # Em loop até a detecç~a o de Ctrl + c
+12   while not rospy . is_shutdown () :
+13       print ( " Hello world number {} " . format ( count ) )
+14       count += 1
+15
+
+16        # Esperar pelo fim do tempo do laço
+17        rate . sleep ()
+         Robot Operating System                                   27 / 144
+                         Topics
+
+
+
+
+Robot Operating System            28 / 144
+Topics
+
+
+
+
+  • Nós se comunicam, trocando informações e dados.
+  • A maneira mais comum de fazer isso é através de tópicos (topics).
+  • Um tópico é um nome para um fluxo de mensagens com um tipo definido.
+  • Por exemplo, os dados de uma câmera podem ser enviados sobre um tópico chamado
+    image topics, com um tipo de mensagem Image.
+
+
+
+
+    Robot Operating System                                                      29 / 144
+publish/subscribe
+
+
+  • Os tópicos implementam um mecanismo de comunicação de publicação / assinatura
+    (publish/subscribe).
+  • Antes de os nós começarem a transmitir dados sobre tópicos, eles devem primeiro
+    anunciar, ou advertise, o nome do tópico e os tipos de mensagens que serão enviadas.
+  • Em seguida, eles podem começar a enviar, ou publish, os dados reais sobre o tópico.
+  • Os nós que desejam receber mensagens em um tópico podem se inscrever, ou
+    subscribe, nesse tópico, solicitando o roscore.
+  • Após a assinatura, todas as mensagens no tópico são entregues no nó que fez a
+    solicitação.
+
+
+
+
+    Robot Operating System                                                              30 / 144
+Publisher
+
+
+
+
+    Robot Operating System   31 / 144
+Subscriber
+
+
+
+
+    Robot Operating System   32 / 144
+1 publisher - 2 subscribers
+
+
+
+
+    Robot Operating System    33 / 144
+1 publisher - 2 subscribers
+
+
+
+
+    Robot Operating System    34 / 144
+2 publishers - 2 subscribers
+
+
+
+
+    Robot Operating System     35 / 144
+                         Publisher
+
+
+
+
+Robot Operating System               36 / 144
+ 1   # ! / usr / bin / python
+ 2
+
+ 3   import rospy
+ 4   # Importaç~
+                a o do modulo de mensagens padr~
+                                               o es
+ 5   from std_msgs . msg import Int32
+ 6
+
+ 7   # Criaç~a o do nó com o nome simple_publisher
+ 8   rospy . init_node ( ’ simple_publisher ’)
+ 9
+
+10   # Criaç~
+             a o do publisher no topic counter de um mensagem de tipo
+         Int32
+11   pub = rospy . Publisher ( ’ counter ’ , Int32 , queue_size =1)
+
+
+
+
+         Robot Operating System                                    37 / 144
+ 1   rate = rospy . Rate (2)
+ 2
+
+ 3   count = 0
+ 4
+
+ 5   while not rospy . is_shutdown () :
+ 6       # Publicaç~a o da mensagem no topico
+ 7       pub . publish ( count )
+ 8
+
+ 9        count += 1
+10        rate . sleep ()
+
+
+
+
+         Robot Operating System                  38 / 144
+Publicar um tópico - 1
+
+    $ from std msgs.msg import Int32
+
+  • Importa a definição da mensagem que vamos enviar sobre o tópico.
+  • Aqui, usamos um número inteiro de 32 bits, definido no pacote de mensagens padrão
+    do ROS, std msgs.
+  • Para que a importação funcione conforme o esperado, precisamos importar do <nome
+    do pacote>.msg, pois é aqui que as definições do pacote são armazenadas.
+  • Como estamos usando uma mensagem de outro pacote, precisamos informar o
+    sistema de criação do ROS sobre isso adicionando uma dependência ao nosso arquivo
+    package.xml.
+
+    $ <depend package="std msgs"/>
+
+  • Sem essa dependência, o ROS não saberá onde encontrar a definição da mensagem.
+    Robot Operating System                                                           39 / 144
+Publicar um tópico - 2
+
+
+
+
+    $ pub = rospy.Publisher(’counter’, Int32)
+
+  • Anuncia o nó com um publicador.
+  • Fornece um nome ao tópico (counter) e especifica o tipo de mensagem que será
+    enviada por ele (Int32).
+  • Neste ponto, o tópico é anunciado e está disponı́vel para outros nós se inscreverem.
+
+
+
+
+     Robot Operating System                                                               40 / 144
+Publicar um tópico - 3
+
+    $ count = 0
+    $ while not rospy.is shutdown():
+    $       pub.publish(count)
+    $       count += 1
+    $       rate.sleep()
+
+  • Primeiro, definimos a taxa, em hertz, na qual queremos publicar.
+  • A função is shutdown() retornará True se o está pronto para ser desligado e False
+    caso contrário, para que possamos usá-lo para determinar se é hora de sair do loop
+    while.
+  • Dentro do loop while, publicamos o valor atual do contador, aumentamos seu valor
+    em 1 e depois dormimos um pouco.
+  • A chamada para rate.sleep() durará o suficiente para garantir que executemos o
+    corpo do loop while em aproximadamente 2 Hz.
+    Robot Operating System                                                            41 / 144
+Verificar se tudo funciona como esperado
+
+
+
+   $ rostopic -h
+
+   $ rostopic list
+
+   $ rosrun package file.py
+
+   $ rostopic list
+
+
+
+
+    Robot Operating System                 42 / 144
+Verificar se tudo funciona como esperado - 2
+
+
+
+   $ rostopic echo topic -n 5
+
+   $ rostopic hz topic
+
+   $ rostopic info topic
+
+   $ rostopic find std msgs/Int32
+
+
+
+
+    Robot Operating System                     43 / 144
+Tipo de mensagem
+
+
+
+
+   Robot Operating System   44 / 144
+                         Controle de base movel
+
+
+
+
+Robot Operating System                            45 / 144
+A mensagem TWIST
+
+
+
+
+ • Para controlar um corpo com 6 graus de liberdade usamos a mensagem padrão
+   TWIST
+   http://docs.ros.org/en/melodic/api/geometry_msgs/html/msg/Twist.html
+ • TWIST é uma estrutura com 6 campos:
+     •   vx : TWIST.linear.x
+     •   vy : TWIST.linear.y
+     •   vz : TWIST.linear.z
+     •   wx : TWIST.angular.x
+     •   wy : TWIST.angular.y
+     •   wz : TWIST.angular.z
+   Robot Operating System                                                       46 / 144
+Controlar o robô TurtleBot
+
+
+  • No terminal 1
+
+    $ roscore
+
+  • No terminal 2
+
+    $ rosrun turtlesim turtlesim node
+
+  • No terminal 3 (opcional)
+
+    $ rosrun turtlesim turtle teleop key
+
+
+
+
+    Robot Operating System                 47 / 144
+ 1   # ! / usr / bin / python
+ 2
+
+ 3   import rospy
+ 4   # Importaç~
+                a o da biblioteca de mensagens de geometria
+ 5   from geometry_msgs . msg import Twist
+ 6
+
+ 7   rospy . init_node ( ’ simple_publisher ’)
+ 8
+
+ 9   # Criaç~
+             a o do publisher no topic / turtle / cmd_vel de uma
+        mensagem de tipo Twist
+10   pub = rospy . Publisher ( ’/ turtle1 / cmd_vel ’ , Twist , queue_size =1)
+11
+
+12   cmd = Twist ()
+
+
+
+         Robot Operating System                                            48 / 144
+ 1   rate = rospy . Rate (1)
+ 2
+
+ 3   count = 0
+ 4   while not rospy . is_shutdown () :
+ 5
+
+ 6       if count % 2 == 0:
+ 7            cmd . linear . x = 1
+ 8            cmd . angular . z = 0
+ 9       else :
+10            cmd . linear . x = 0
+11            cmd . angular . z = 1
+12
+
+13       pub . publish ( cmd )
+14       count += 1
+15       rate . sleep ()
+
+
+         Robot Operating System           49 / 144
+Controlar o robô TIAGo
+
+
+
+
+  • No workspace do Tiago
+
+    $ roslaunch tiago gazebo tiago gazebo.launch public sim:=true
+    end effector:=pal-gripper
+
+
+
+
+    Robot Operating System                                          50 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from geometry_msgs . msg import Twist
+ 5
+
+ 6
+
+ 7   rospy . init_node ( ’ simple_publisher ’)
+ 8
+
+ 9   # Criaç~
+             a o do publisher no topic / m o b i l e _ b a s e _ c o n t r o l l e r /
+        cmd_vel de uma mensagem de tipo Twist
+10   pub = rospy . Publisher ( ’/ m o b i l e _ b a s e _ c o n t r o l l e r / cmd_vel ’ , Twist
+        , queue_size =1)
+11
+
+12   cmd = Twist ()
+
+
+          Robot Operating System                                                              51 / 144
+ 1   rate = rospy . Rate (1)
+ 2
+
+ 3   count = 0
+ 4   while not rospy . is_shutdown () :
+ 5
+
+ 6       if count % 2 == 0:
+ 7            cmd . linear . x = 1
+ 8            cmd . angular . z = 0
+ 9       else :
+10            cmd . linear . x = 0
+11            cmd . angular . z = 1
+12
+
+13       pub . publish ( cmd )
+14       count += 1
+15       rate . sleep ()
+
+
+         Robot Operating System           52 / 144
+                         Controle de braço robótico
+
+
+
+
+Robot Operating System                                  53 / 144
+Manipuladores
+
+
+
+
+ • Manipuladores robóticos são um conjunto de juntas mantidas juntas por uma
+   estrutura de algum tipo.
+     • As juntas rotativas giram em torno de um eixo de rotação.
+     • As juntas prismáticas movem-se linearmente ao longo de um eixo de movimento.
+ • Um link é uma seção de um braço de robô conectada por uma junta.
+
+   Robot Operating System                                                              54 / 144
+A mensagem JointTrajectory
+
+
+
+ • Para controlar um conjunto de juntas usamos a mensagem padrão JointTrajectory
+   http://docs.ros.org/en/melodic/api/trajectory_msgs/html/msg/
+   JointTrajectory.html
+ • JointTrajectory é uma estrutura com 3 campos:
+     • std msgs/Header header
+     • string[] joint names
+     • trajectory msgs/JointTrajectoryPoint[] points
+ • O nome das juntas deve corresponder ao nome no controlador (usar rostopic list &
+   echo para encontrar)
+
+
+
+
+   Robot Operating System                                                         55 / 144
+A mensagem std msgs/Header
+
+ • Para controlar um conjunto de juntas usamos a mensagem padrão Header
+   http://docs.ros.org/en/melodic/api/std_msgs/html/msg/Header.html
+ • Header é uma estrutura com 3 campos:
+     • uint32 seq
+     • time stamp
+     • string frame id
+
+
+
+
+   Robot Operating System                                                  56 / 144
+A mensagem trajectory msgs/JointTrajectoryPoint[]
+
+ • Para criar uma trajetória usamos a mensagem padrão JointTrajectoryPoint[]
+   http://docs.ros.org/en/melodic/api/trajectory_msgs/html/msg/
+   JointTrajectoryPoint.html
+ • JointTrajectoryPoint[] é uma estrutura com 5 campos:
+     •   float64[] positions
+     •   float64[] velocities
+     •   float64[] accelerations
+     •   float64[] effort
+     •   duration time from start
+ • Apenas um dos campos pode ser usado por vez (positions, velocities, acceleration
+   ou effort).
+ • O campo time from start é obrigatório.
+
+
+   Robot Operating System                                                        57 / 144
+ 1   # ! / usr / bin / python
+ 2
+
+ 3   import rospy
+ 4   # Importaç~
+                a o da biblioteca de mensagens de trajetoria
+ 5   from trajectory_msgs . msg import JointTrajectory
+ 6   from trajectory_msgs . msg import J o i n t T r a j e c t o r y P o i n t
+ 7
+
+ 8   rospy . init_node ( ’ move_arm ’)
+ 9
+
+10   # Criaç~
+             a o do publisher no topic / arm_controller / command
+11   # de uma mensagem de tipo JointTrajectory
+12   pub = rospy . Publisher ( ’/ arm_controller / command ’ ,
+        JointTrajectory , queue_size =1)
+
+
+
+         Robot Operating System                                                  58 / 144
+ 1   cmd = JointTrajectory ()
+ 2
+
+ 3   cmd . joint_names . append ( " arm_1_joint " )
+ 4   cmd . joint_names . append ( " arm_2_joint " )
+ 5   cmd . joint_names . append ( " arm_3_joint " )
+ 6   cmd . joint_names . append ( " arm_4_joint " )
+ 7   cmd . joint_names . append ( " arm_5_joint " )
+ 8   cmd . joint_names . append ( " arm_6_joint " )
+ 9   cmd . joint_names . append ( " arm_7_joint " )
+10
+
+11   point = JointTraje c t o r y P o i n t ()
+12   point . positions = [0] * 7
+13   point . time_from_start = rospy . Duration (1)
+14
+
+15   cmd . points . append ( point )
+
+
+         Robot Operating System                       59 / 144
+ 1   rate = rospy . Rate (1)
+ 2
+
+ 3   angle = 0.1
+ 4
+
+ 5   while not rospy . is_shutdown () :
+ 6
+
+ 7       cmd . points [0]. positions [1] = angle
+ 8       cmd . points [0]. time_from_start = rospy . Duration (1)
+ 9
+
+10       pub . publish ( cmd )
+11       angle += 0.1
+12       rate . sleep ()
+
+
+
+
+         Robot Operating System                                     60 / 144
+                         Subscriber
+
+
+
+
+Robot Operating System                61 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from std_msgs . msg import Int32
+ 5
+
+ 6
+
+ 7   # Define the function called by the subscriber
+ 8   def callback ( msg ) :
+ 9       print ( msg . data )
+10
+
+11   rospy . init_node ( ’ simpl e_subs criber ’)
+12
+
+13   # Define the new subsriber
+14   rospy . Subscriber ( ’ counter ’ , Int32 , callback )
+15
+
+16   # Equivalent to an infinite while to not close the program
+17   rospy . spin ()
+         Robot Operating System                                   62 / 144
+Inscrevendo-se em um tópico - 1
+
+
+  • A primeira parte interessante desse código é o callback (retorno de chamada) que lida
+    com as mensagens quando elas chegam.
+
+    $ def callback(msg):
+    $       print msg.data
+
+  • O ROS é um sistema orientado a eventos e utiliza muito as funções de callback.
+  • Depois que um nó se inscreve em um tópico, toda vez que uma mensagem chega, a
+    função de callback associada é chamada, com a mensagem como parâmetro.
+
+
+
+
+    Robot Operating System                                                             63 / 144
+Inscrevendo-se em um tópico - 2
+
+
+  • Após inicializar o nó, como antes, assinamos o tópico do contador:
+
+    $ sub = rospy.Subscriber(’counter’, Int32, callback)
+
+  • Fornecemos o nome do tópico, o tipo de mensagem do tópico e o nome da função de
+    callback.
+  • Se o tópico não existir, ou se o tipo estiver errado, não haverá mensagens de erro: o
+    nó simplesmente aguardará até que as mensagens comecem a ser publicadas no tópico.
+  • Depois que a assinatura é feita, damos controle ao ROS chamando rospy.spin().
+  • Esta função retornará apenas quando o nó estiver pronto para desligar.
+
+
+
+    Robot Operating System                                                              64 / 144
+Verificar se tudo funciona como esperado
+
+  • Primeiro, verifique se o nó do editor ainda está em execução e se ainda está
+    publicando mensagens no tópico do contador.
+  • Em outro terminal, inicie o nó do assinante.
+
+    $ rosrun package file.py
+
+    $ rostopic info topic
+
+  • Também podemos publicar mensagens em um tópico na linha de comando usando o
+    rostopic pub.
+
+    $ rostopic pub topic messageType valor
+    $ rostopic pub counter std msgs/Int32 1000000
+
+     Robot Operating System                                                             65 / 144
+Problema com frequência de publicação
+
+
+
+
+  • O tempo de execução da função callback pode ser incompatı́vel com a frequência de
+    publicação
+
+
+
+
+    Robot Operating System                                                             66 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   import time
+ 5   from std_msgs . msg import Int32
+ 6
+
+ 7   # Define the function called by the subscriber
+ 8   def callback ( msg ) :
+ 9       print msg . data
+10       time . sleep (1) # Simulate some processing
+11
+
+12   rospy . init_node ( ’ simpl e_subs criber ’)
+13
+
+14   # queue_size is used to read the last message
+15   rospy . Subscriber ( ’ counter ’ , Int32 , callback , queue_size =1)
+16
+
+17   rospy . spin ()
+         Robot Operating System                                             67 / 144
+Subscriber com Programação Orientada a Objetos
+
+
+
+
+  • Precisamos de usar a programação orientada a objetos para implementar
+    corretamente um subscriber
+
+
+
+
+    Robot Operating System                                                    68 / 144
+1   # ! / usr / bin / python3
+2
+
+3   import rospy
+4   from std_msgs . msg import Int32
+
+
+
+
+        Robot Operating System         69 / 144
+ 1   # Definition of the class
+ 2   class mySub () :
+ 3
+
+ 4      def __init__ ( self ) :
+ 5          # Define the subscriber
+ 6          self . sub = rospy . Subscriber ( ’ counter ’ , Int32 , self .
+       callback , queue_size =1)
+ 7
+
+ 8              # Message variables
+ 9              self . counterValue = 0
+10
+
+11       # Definition of the function called by the subscriber
+12       def callback ( self , msg ) :
+13           self . counterValue = msg . data
+14
+
+15       def printMsg ( self ) :
+16           print ( self . counterValue )
+        Robot Operating System                                               70 / 144
+ 1   # Main program
+ 2   if __name__ == ’ __main__ ’:
+ 3       # Define the node
+ 4       rospy . init_node ( ’ simpleSubPOO ’)
+ 5       # Creaete an object of class mySub and run the init
+        function
+ 6       subObj = mySub ()
+ 7       # While ROS is running
+ 8       while not rospy . is_shutdown () :
+ 9           # Call printMsg method of mySub class
+10           subObj . printMsg ()
+
+
+
+
+        Robot Operating System                                 71 / 144
+                         Odometria
+
+
+
+
+Robot Operating System               72 / 144
+Orientação de um corpo rı́gido
+
+
+
+  • Existem várias soluções para descrever a orientação de um corpo rı́gido:
+       •   Quaternion
+       •   Ângulos de Euler
+       •   Matriz de orientação
+       •   ...
+  • ROS dá orientação como um quatérnion
+  • Precisamos fazer a conversão Quaternion → Ângulos de Euler
+
+
+
+
+     Robot Operating System                                                         73 / 144
+Ângulos de Euler
+  • Esse método usa dois sistemas de coordenadas:
+       • Um sistema inercial fixo
+       • Um sistema que gira junto ao corpo em rotação
+  • Para especificar a orientação do corpo girante em relação ao sistema inercial (fixo)
+    faz-se uso de três ângulos independentes:
+       • Uma rotação ϕ em torno do eixo Z0 que dá a base 1
+       • Uma rotação θ em torno do eixo X1 que dá a base 2
+       • Uma rotação ψ em torno do eixo Z2 que dá a base 3
+
+
+
+
+     Robot Operating System                                                                74 / 144
+A mensagem nav msgs/Odometry
+
+
+
+ • Para compartilhar os dados de odometria usamos a mensagem padrão Odometry
+   http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html
+ • Odometry é uma estrutura com 4 campos e usamos principalmente os seguintes:
+      • geometry msgs/PoseWithCovariance pose
+      • geometry msgs/TwistWithCovariance twist
+ • pose: pose (posição e orientação) do corpo rı́gido
+ • twist: velocidade do corpo rı́gido
+
+
+
+
+    Robot Operating System                                                    75 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from nav_msgs . msg import Odometry
+ 5
+
+ 6   # Definition of the class
+ 7   class mySub () :
+ 8
+
+ 9       def __init__ ( self ) :
+10             # Define the subscriber
+11             self . sub = rospy . Subscriber ( ’/ m o b i l e _ b a s e _ c o n t r o l l e r /
+        odom ’ , Odometry , self . callback , queue_size =1)
+12
+
+13        # Definition of the function called by the subscriber
+14        def callback ( self , msg ) :
+15            # self . counterValue = msg . data
+16            print ( msg . pose )
+         Robot Operating System                                                                76 / 144
+1   # Main program
+2   if __name__ == ’ __main__ ’:
+3       # Define the node
+4       rospy . init_node ( ’ TIAGo_odem_node ’)
+5       # Create an object of class mySub and run the init
+       function
+6       subObj = mySub ()
+7       # While ROS is running
+8       rospy . spin ()
+
+
+
+
+       Robot Operating System                                77 / 144
+TIAGo Odometry com angulos de Euler
+
+
+
+
+ • ROS usa os quaternions para representar a orientatção
+ • Pode ser necessário convertê-la em ângulos (Euler por exmplo)
+
+
+
+
+   Robot Operating System                                             78 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from nav_msgs . msg import Odometry
+ 5   from tf . transformations import euler_from_quaternion ,
+        q u a t ern ion_ from _ e u l e r
+ 6
+
+ 7   class mySub () :
+ 8       def __init__ ( self ) :
+ 9             self . sub = rospy . Subscriber ( ’/ m o b i l e _ b a s e _ c o n t r o l l e r /
+        odom ’ , Odometry , self . callback , queue_size =1)
+10
+
+11         def callback ( self , msg ) :
+12             qtn = msg . pose . pose . orientation
+13             qtn_list = [ qtn .x , qtn .y , qtn .z , qtn . w ]
+14             ( roll , pitch , yaw ) = e u l e r _ f r o m _ q u a t e r n i o n ( qtn_list )
+15             print ( roll , pitch , yaw )
+          Robot Operating System                                                               79 / 144
+1   # Main program
+2   if __name__ == ’ __main__ ’:
+3       # Define the node
+4       rospy . init_node ( ’ TIAGo_odem_node ’)
+5       # Create an object of class mySub and run the init
+       function
+6       subObj = mySub ()
+7       # While ROS is running
+8       rospy . spin ()
+
+
+
+
+       Robot Operating System                                80 / 144
+                         Laser
+
+
+
+
+Robot Operating System           81 / 144
+A mensagem sensor msgs/LaserScan
+
+
+
+ • Para compartilhar os dados de um laser usamos a mensagem padrão LaserScan
+   http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/LaserScan.html
+ • LaserScan é uma estrutura com 10 campos e usamos principalmente os seguintes:
+     •   float32 angle min: ângulo mı́nimo
+     •   float32 angle max: ângulo maximo
+     •   float32 angle increment: ângulo entre cada raio do laser
+     •   float32[] ranges: arranjo com as distâncias medidas por cada raio
+ • O número de raio é: (angle max − angle min)/angle increment
+
+
+
+
+   Robot Operating System                                                       82 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from sensor_msgs . msg import LaserScan
+ 5
+
+ 6   class mySub () :
+ 7
+
+ 8       def __init__ ( self ) :
+ 9             self . sub = rospy . Subscriber ( ’/ scan_raw ’ , LaserScan ,
+        self . callback , queue_size =1)
+10
+
+11        # Definition of the function called by the subscriber
+12        def callback ( self , msg ) :
+13            # self . counterValue = msg . data
+14            print ( msg . ranges )
+
+
+         Robot Operating System                                                83 / 144
+1   # Main program
+2   if __name__ == ’ __main__ ’:
+3       # Define the node
+4       rospy . init_node ( ’ TIAGo_laser_node ’)
+5       # Creaete an object of class mySub and run the init
+       function
+6       subObj = mySub ()
+7       # While ROS is running
+8       rospy . spin ()
+
+
+
+
+       Robot Operating System                                 84 / 144
+                         Imagem
+
+
+
+
+Robot Operating System            85 / 144
+Imagem digital
+  • Uma imagem digital é uma matrizes com 3 dimensões.
+      • Primeira dimensão: largura da imagem
+      • Segunda dimensão altura da imagem
+      • Terceira dimensão: cores (vermelho, verde e azul)
+  • Cada pixel há um valor entre 0 e 255 (uint8) ou entre 0 e 1
+
+
+
+
+  • Nós sempre convertemos uma mensagem de imagem para um tipo opencv.
+    Robot Operating System                                                86 / 144
+ 1   # !/ usr / bin / env python3
+ 2   import rospy
+ 3   import cv2
+ 4   from cv_bridge import CvBridge , CvBridgeError
+ 5   from sensor_msgs . msg import Image
+ 6
+
+ 7   class myCamera () :
+ 8
+
+ 9       def __init__ ( self ) :
+10           print ( ’ init camera ’)
+11           # Bridge to convert ROS message to openCV
+12           self . bridge = CvBridge ()
+13
+
+14           # Subscriber to the camera image
+15           self . image_sub = rospy . Subscriber ( " / xtion / rgb /
+        image_color " , Image , self . imageCallBack )
+
+        Robot Operating System                                           87 / 144
+ 1    def c a ll b a c k_ S u b s c r i b e C a m e r a ( self , msg ) :
+ 2          print ( ’ callback camera ’)
+ 3          try :
+ 4                self . cv_image = self . bridge . imgmsg_to_cv2 ( msg , "
+     bgr8 " )
+ 5          except CvBridgeError as e :
+ 6                print ( e )
+ 7
+
+ 8            # cv_image [ linha ][ coluna ][ bgr ] bgr - > 0: blue , 1: green ,
+     2: red
+ 9            print ( self . cv_image [0][0])
+10            print ( self . cv_image [0][0][0])
+11
+
+12            # Display the image
+13            cv2 . imshow ( " raw " , self . cv_image )
+14            cv2 . waitKey (3)
+
+     Robot Operating System                                                   88 / 144
+            Definir e usar um novo tipo de mensagem
+
+
+
+
+Robot Operating System                                89 / 144
+Definir uma nova mensagem
+
+
+ • As mensagens ROS são definidas por arquivos especiais de definição de mensagens no
+   diretório msg de um pacote.
+ • Esses arquivos são compilados em implementações especı́ficas do idioma que podem
+   ser usadas no seu código.
+ • Você precisa executar catkin make se quiser definir seus próprios tipos de mensagens.
+ • Os arquivos de definição de mensagem geralmente são bastante simples e curtos.
+ • Cada linha especifica um tipo e um nome de campo.
+ • Os tipos podem ser tipos primitivos ROS internos, tipos de mensagens de outros
+   pacotes, matrizes de tipos ou o tipo especial Header.
+
+
+
+
+   Robot Operating System                                                              90 / 144
+Definir uma nova mensagem - Exemplo - 1
+
+
+
+
+ • O arquivo Complex.msg está no diretório msg do pacote básico.
+ • Ele define dois valores, real e imaginário, ambos com o mesmo tipo float32.
+
+   $ float32 real
+   $ float32 imaginary
+
+
+
+
+    Robot Operating System                                                        91 / 144
+Definir uma nova mensagem - Exemplo - 2
+
+
+
+ • Para que o ROS gere o código de mensagem especı́fico do idioma, precisamos
+   informar o sistema de compilação sobre as novas definições de mensagem.
+ • Podemos fazer isso adicionando estas linhas ao nosso arquivo package.xml do pacote:
+
+   $ <build depend>message generation</build depend>
+   $ <exec depend>message runtime</exec depend>
+
+
+
+
+    Robot Operating System                                                        92 / 144
+Definir uma nova mensagem - Exemplo - 3
+
+
+ • Precisamos fazer algumas alterações no arquivo CMakeLists.txt do pacote.
+ • Primeiro, precisamos adicionar message generation ao final da chamada
+   find package(), para que o catkin saiba procurar o pacote message generation
+
+   $ find package(catkin REQUIRED COMPONENTS
+   $        roscpp
+   $        rospy
+   $        std msgs
+   $        message generation
+   $)
+
+
+
+    Robot Operating System                                                    93 / 144
+Definir uma nova mensagem - Exemplo - 4
+
+
+
+ • Dizemos a catkin quais arquivos de mensagem queremos compilar adicionando-os à
+   chamada add message files():
+
+   $ add message files(
+   $        FILES
+   $        Complex.msg
+   $)
+
+
+
+
+    Robot Operating System                                                     94 / 144
+Definir uma nova mensagem - Exemplo - 5
+
+
+
+ • Finalmente, ainda no arquivo CMakeLists.txt, precisamos garantir que a chamada
+   generate messages() não seja comentada e contenha todas as dependências
+   necessárias às nossas mensagens.
+
+   $ generate messages(
+   $        DEPENDENCIES
+   $        std msgs
+   $)
+
+
+
+
+    Robot Operating System                                                     95 / 144
+Definir uma nova mensagem - Exemplo - 6
+
+
+
+
+ • Agora que dissemos tudo o que precisamos saber sobre nossas mensagens, estamos
+   prontos para compilá-las.
+ • Vá para a raiz do seu espaço de trabalho catkin e execute catkin make.
+ • Isso gerará um tipo de mensagem com o mesmo nome que o arquivo de definição de
+   mensagem, com a extensão .msg removida.
+
+
+
+
+    Robot Operating System                                                        96 / 144
+ 1   # !/ usr / bin / env python3
+ 2
+
+ 3   import rospy
+ 4   from pack . msg import Complex
+ 5   from random import random
+ 6
+
+ 7   rospy . init_node ( " messa ge_pub lisher " )
+ 8
+
+ 9   pub = rospy . Publisher ( " complex " , Complex , queue_size = 1)
+10   rate = rospy . Rate (2)
+11
+
+12   while not rospy . is_shutdown () :
+13       msg = Complex ()
+14       msg . real = random ()
+15       msg . imaginary = random ()
+16       pub . publish ( msg )
+17       rate . sleep ()
+         Robot Operating System                                          97 / 144
+Usar a nova mensagem - 1
+ • A importação do seu novo tipo de mensagem funciona como incluir um tipo de
+   mensagem ROS padrão.
+ • O nome da biblioteca é o nome do pacote.
+
+   $ from pack.msg import Complex
+
+ • Depois de criar a instância, você pode preencher os valores para os campos
+   individuais.
+ • Quaisquer campos aos quais não seja atribuı́do um valor explicitamente devem ser
+   considerados como tendo um valor indefinido.
+
+   $ msg = Complex()
+   $ msg.real = random()
+   $ msg.imaginary = random()
+    Robot Operating System                                                         98 / 144
+ 1   # !/ usr / bin / env python
+ 2
+
+ 3   import rospy
+ 4   from pack . msg import Complex
+ 5
+
+ 6   def callback ( msg ) :
+ 7       print ( " Real : {} " . format ( msg . real ) )
+ 8       print ( " Imaginary : {} " . format ( msg . imaginary ) )
+ 9
+
+10   rospy . init_node ( " message subscriber " )
+11   sub = rospy . Subscriber ( " complex " , Complex , callback )
+12   rospy . spin ()
+
+
+
+
+         Robot Operating System                                      99 / 144
+Usar a nova mensagem - 2
+
+ • O comando rosmsg permite examinar o conteúdo de um tipo de mensagem.
+ • Se uma mensagem contiver outras mensagens, elas serão exibidas recursivamente por
+   rosmsg.
+
+   $ >>rosmsg show Complex
+   $ [basics/Complex]:
+   $ float32 real
+   $ float32 imaginary
+
+ • rosmsg list: mostra todas as mensagens disponı́veis no ROS.
+ • rosmsg packages: lista todos os pacotes que definem mensagens.
+ • rosmsg package: lista as mensagens definidas em um pacote especı́fico
+
+    Robot Operating System                                                       100 / 144
+                         Serviços
+
+
+
+
+Robot Operating System               101 / 144
+Serviços
+
+
+  • Os serviços são outra maneira de transmitir dados entre nós no ROS.
+  • Serviços são apenas chamadas de procedimento remoto sı́ncronas; eles permitem que
+    um nó chame uma função que é executada em outro nó.
+  • Definimos as entradas e saı́das dessa função de maneira semelhante à maneira como
+    definimos novos tipos de mensagens.
+  • O servidor (que fornece o serviço) especifica um callback para lidar com a solicitação
+    de serviço e anuncia o serviço.
+  • O cliente (que chama o serviço) acessa esse serviço por meio de um proxy local.
+  • As chamadas de serviço são adequadas para coisas que só precisam ser feitas
+    ocasionalmente.
+
+
+
+     Robot Operating System                                                              102 / 144
+Definir um serviço - 1
+
+
+
+  • A primeira etapa na criação de um novo serviço é definir as entradas e saı́das da
+    chamada de serviço.
+  • Isso é feito em um arquivo de definição de serviço, que possui uma estrutura
+    semelhante aos arquivos de definição de mensagem
+  • No entanto, uma chamada de serviço possui entradas e saı́das.
+  • Exemplo: um serviço adiciona dois inteiros.
+       • A entrada para a chamada de serviço deve ser dois números inteiros.
+       • A saı́da deve ser um número inteiro.
+
+
+
+
+     Robot Operating System                                                                 103 / 144
+Definir um serviço - 2
+
+
+AddTwoInts.srv
+    $ int64 A
+    $ int64 B
+    $ ---
+    $ int64 Sum
+
+  • O arquivo que contém essa definição é chamado AddTwoIntst.srv e está
+    tradicionalmente em um diretório chamado srv no diretório principal do pacote.
+  • As entradas para a chamada de serviço vêm primeiro.
+  • Três traços (- - -) marcam o final das entradas e o inı́cio de a definição de saı́da.
+  • Finalmente, as saı́das para a chamada de serviço vêm.
+
+
+     Robot Operating System                                                                     104 / 144
+Definir um serviço - 3
+
+
+  • Precisamos executar catkin makea partir do diretório principal do pacote para criar
+    as definições de código e classe que realmente usaremos ao interagir com o serviço.
+  • Temos que fazer uma adição ao arquivo package.xml do diretório principal do
+    pacote para refletir as dependências tanto no rospy quanto no sistema de mensagens.
+
+    $ <build depend>rospy</build depend>
+    $ <exec depend>rospy</exec depend>
+    $
+    $ <build depend>message generation</build depend>
+    $ <exec depend>message runtime</exec depend>
+
+
+
+    Robot Operating System                                                            105 / 144
+Definir um serviço - 4
+
+
+  • Precisamos fazer algumas alterações no arquivo CMakeLists.txt no diretório
+    principal do pacote.
+  • Primeiro, precisamos adicionar message generation ao final da chamada
+    find package(), para que o catkin saiba procurar o pacote message generation
+
+    $ find package(catkin REQUIRED COMPONENTS
+    $       roscpp
+    $       rospy
+    $       message generation)
+
+
+
+
+    Robot Operating System                                                     106 / 144
+Definir um serviço - 5
+
+
+
+  • Precisamos informar quais arquivos de definição de serviço queremos compilar,
+    usando a chamada add service files().
+
+    $ add service files(
+    $       FILES
+    $       AddTwoInts.srv)
+
+
+
+
+    Robot Operating System                                                             107 / 144
+Definir um serviço - 6
+
+  • Devemos garantir que as dependências para o arquivo de definição de serviço sejam
+    declaradas, usando a chamada generate messages().
+
+    $ generate messages(
+    $       DEPENDENCIES
+    $       std msgs
+    $)
+
+  • A execução de catkin make gerará três classes: AddTwoInts, AddTwoIntsRequest e
+    AddTwoIntsResponse.
+  • Essas classes serão usadas para interagir com o serviço.
+  • Podemos verificar se a definição de chamada de serviço é o que esperamos usando o
+    comando rossrv.
+
+    Robot Operating System                                                            108 / 144
+Implementar um serviço - 1
+
+
+
+
+  • Serviços são um mecanismo baseado em callback.
+  • O provedor especifica um callback que será executado quando a chamada de serviço
+    for feita e aguarda a chegada de solicitações.
+
+
+
+
+    Robot Operating System                                                         109 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4
+
+ 5   # Import the service classes : servive definition , response
+        message
+ 6   from pkg_name . srv import AddTwoInts , A dd Tw oI nt sR es po ns e
+ 7
+
+ 8   # Definition of the function called by the serice
+ 9   def c a llback_AddTw oI n t s ( req ) :
+10
+
+11        # Create a response variable
+12        res = AddTwoIn tsR es po ns e ()
+13        # Compute the sum
+14        res = req . A + req . B
+15        # Return the response variable
+16        return res
+         Robot Operating System                                            110 / 144
+ 1   if __name__ == " __main__ " :
+ 2
+
+ 3       # Start the node
+ 4       rospy . init_node ( " A d d T w o I n t s _ s e r v e r _ n o d e " )
+ 5       # Start the service server
+ 6       my_service = rospy . Service ( ’ a d d _ t w o _ i n t s _ s e r v i c e _ n a m e ’ ,
+        AddTwoInts , cal lb a c k_ A d dT w o In t s )
+ 7
+
+ 8       print ( " Ready to add two ints . " )
+ 9
+
+10       # Wait to be closed by the user
+11       rospy . spin ()
+
+
+
+
+        Robot Operating System                                                                    111 / 144
+Implementar um serviço - 2
+
+
+
+  • Primeiro precisamos importar o código gerado pelo catkin.
+
+    $ from pkg name.srv import AddTwoInts,AddTwoIntsResponse
+
+  • Precisamos importar o AddTwoInts e o AddTwoIntsResponse.
+  • Ambos são gerados em um módulo Python com o mesmo nome do pacote, com
+    uma extensão .srv.
+
+
+
+
+    Robot Operating System                                               112 / 144
+Implementar um serviço - 3
+
+
+
+  • A função callback
+        • usa um único argumento do tipo AddTwoIntsRequest
+        • retorna um único argumento do tipo AddTwoIntsResponse
+
+    $ def callback AddTwoInts(AddTwoIntsRequest):
+    $        return AddTwoIntsResponse
+
+
+
+
+     Robot Operating System                                        113 / 144
+Implementar um serviço - 4
+
+
+  • Na função MAIN
+  • Depois de inicializar o nó, anunciamos o serviço, fornecendo:
+      • um nome (add two ints service name);
+      • um tipo (AddTwoInts);
+      • um handler (h AddTwoInts).
+
+    $ my service = rospy.Service(’add two ints service name’, AddTwoInts,
+    handle AddTwoInts)
+
+  • Fazemos uma chamada para rospy.spin(), que fornece o controle do nó para o ROS
+    e sai quando o nó está pronto para desligar.
+
+
+
+    Robot Operating System                                                    114 / 144
+Verificar se tudo funciona como esperado
+
+
+
+
+   $ rosrun pkg name simpleServer.py
+
+   $ rosservice list
+
+   $ rosservice info AddTwoInts
+
+
+
+
+    Robot Operating System                 115 / 144
+ 1   # ! / usr / bin / python3
+ 2
+
+ 3   import rospy
+ 4   from aula_offline . srv import *
+ 5
+
+ 6   if __name__ == " __main__ " :
+ 7
+
+ 8        # Wait for the server to be started
+ 9        rospy . wait_for_service ( ’ a d d _ t w o _ i n t s _ s e r v i c e _ n a m e ’)
+10        print ( " add_two_ints service is active " )
+
+
+
+
+         Robot Operating System                                                               116 / 144
+ 1    try :
+ 2             # Connect to the server
+ 3             h_AddTwoInts = rospy . ServiceProxy ( ’
+     a d d _ t w o _ i n t s _ se r v i c e _ n a m e ’ , AddTwoInts )
+ 4
+
+ 5            # Create and fill the resquest
+ 6            request = Ad dTwoI ntsReq uest ()
+ 7            print ( ’ Service call ’)
+ 8            request . A = 2
+ 9            request . B = 3
+10            # Call the service
+11            response = h_AddTwoInts ( request )
+12            print ( response . Sum )
+13
+
+14    # If the connection fails ( DEBUG )
+15    except rospy . ServiceException as e :
+16        print ( " Service call failed : % s " % e )
+     Robot Operating System                                              117 / 144
+Usar um serviço - 1
+
+
+
+
+  • Primeiro, esperamos que o serviço seja anunciado pelo servidor.
+
+    $ rospy.wait for service(’add two ints service name’)
+
+  • Se tentarmos usar o serviço antes de ser anunciado, a chamada falhará.
+  • Essa é uma grande diferença entre tópicos e serviços.
+
+
+
+
+    Robot Operating System                                                     118 / 144
+Usar um serviço - 2
+
+
+  • Depois que o serviço é anunciado, podemos configurar um proxy local para ele.
+
+    $ h AddTwoInts = rospy.ServiceProxy(’add two ints service name’,
+    AddTwoInts)
+
+  • Precisamos especificar o nome do serviço (add two ints service name) e o tipo
+    (AddTwoInts).
+  • Isso nos permitirá usar o h AddTwoInts como uma função local que, quando
+    chamada, realmente fará a chamada de serviço para nós.
+
+    $ response = h AddTwoInts(request)
+
+
+
+    Robot Operating System                                                            119 / 144
+Comunicação assı́ncrona vs sı́ncrona
+
+
+  • Publisher / Subscriber
+      •   many-to-many
+      •   One-way transport
+      •   Assı́ncrono
+      •   Code will not block
+  • Servicio
+      •   One to one
+      •   Two-way transport
+      •   Sı́ncrono
+      •   Code will block
+
+
+
+
+    Robot Operating System               120 / 144
+                         RQt
+
+
+
+
+Robot Operating System         121 / 144
+RQt
+
+
+ • RQt é uma estrutura de interface gráfica do usuário que implementa várias
+   ferramentas e interfaces na forma de plug-ins.
+ • Pode-se executar todas as ferramentas GUI existentes como janelas encaixáveis no
+   RQt
+ • Você pode executar qualquer ferramenta / plug-in rqt facilmente:
+
+   $ >>rqt
+
+ • Vantagens:
+        • Procedimentos comuns padronizados para GUI
+        • Vários widgets encaixáveis em uma única janela
+        • Suporte multiplataforma e multilı́ngue
+
+
+
+      Robot Operating System                                                      122 / 144
+                         RVIZ
+
+
+
+
+Robot Operating System          123 / 144
+RVIZ
+
+
+
+ • RVIZ é uma ferramenta de visualização 3D para aplicativos ROS.
+ • Ele fornece uma visão do modelo do seu robô, captura informações do sensor dos
+   sensores do robô e reproduz os dados capturados.
+ • Ele pode exibir dados de câmeras, lasers e dispositivos 3D e 2D, incluindo imagens e
+   nuvens de pontos.
+ • Para iniciá-lo, digite (com roscore rodando):
+
+   $ >>rviz rviz
+
+
+
+
+   Robot Operating System                                                           124 / 144
+RVIZ - 2
+
+
+ • Informe ao rviz qual frame fixo queremos usar.
+   No grupo ’Displays’, no item ’Global Options’, clique no rótulo do quadro ao lado de
+   ’Fixed Frame’. Digite ou selecione ’base link’.
+ • Visualizando o modelo do robô
+   Clique em ’Adicionar’ e vá até ’rviz >RobotModel’ e clique em ’OK’.
+ • Visualizando Informações do Sensor
+      • Clique em ”Add”e adicione um ”Item”. Selecione um topico no campo ”Topic”
+      • Clique em ”Add”e adicione um ”Topic.
+ • Para salvar a configuração como padrão, clique em ”File >Save Config”.
+   Na próxima vez que você executar o rviz, ele carregará essa configuração.
+
+
+
+    Robot Operating System                                                          125 / 144
+Mensagens de visualização
+
+
+
+  • visualization msgs é um conjunto de mensagens usado por pacotes de nı́vel
+    superior, como rviz, que lidam com dados especı́ficos de visualização
+    http://wiki.ros.org/visualization_msgs
+  • A principal mensagem em visualization msgs é visualization msgs/Marker
+    http://docs.ros.org/en/api/visualization_msgs/html/msg/Marker.html
+  • A mensagem Marker é usada para enviar ”marcadores”de visualização como caixas,
+    esferas, setas, linhas, etc. para um ambiente de visualização como o rviz
+
+
+
+
+    Robot Operating System                                                        126 / 144
+Exemplo
+
+
+   $   marker = Marker()
+   $   marker.header.frame id = "base link"
+   $   marker.type = marker.SPHERE
+   $   marker.action = marker.ADD
+   $   marker.scale.x = 0.05
+   $   marker.scale.y = 0.05
+   $   marker.scale.z = 0.05
+   $   marker.color.a = 1.0
+   $   marker.color.r = 1.0
+   $   marker.color.g = 0.0
+   $   marker.color.b = 1.0
+   $   marker.pose.orientation.w = 1.0
+   $   marker.pose.position.x = x
+   $   marker.pose.position.y = y
+   $   marker.pose.position.z = z
+
+
+
+
+   Robot Operating System                     127 / 144
+                         Rosbag
+
+
+
+
+Robot Operating System            128 / 144
+Gravação de todos os tópicos publicados
+  • É possı́vel gravar dados de um sistema ROS em execução em um arquivo .bag, e
+    depois reproduzir os dados para produzir um comportamento semelhante em um
+    sistema em execução
+  • Os tópicos publicados são os únicos tipos de mensagem que poderiam potencialmente
+    ser gravados no arquivo de registro de dados, já que somente as mensagens publicadas
+    são gravados.
+  • Para gravar todos os tópicos, abrir um terminal e digitar:
+
+    $ >>mkdir bagfiles
+    $ >>cd bagfiles
+    $ >>rosbag record -a
+
+  • O usuário escolhe o nome e a localização do diretório.
+  • -a, indica que todos os tópicos publicados devem ser acumulados em um rosbag.
+    Robot Operating System                                                           129 / 144
+Examinando e tocando o arquivo rosbag
+
+
+
+ • Para ver o que está gravado no arquivo rosbag, usamos o comando info:
+
+   $ >>rosbag info <your bagfile>
+
+ • Reproduzir o rosbag para reproduzir o comportamento no sistema em execução:
+
+   $ >>rosbag play <your bagfile>
+
+
+
+
+    Robot Operating System                                                         130 / 144
+Gravação de um subconjunto dos dados
+
+
+
+  • Pode haver centenas de tópicos sendo publicados, com alguns tópicos, como fluxos de
+    imagens de câmeras, potencialmente publicando enormes quantidades de dados.
+  • Em tal sistema, muitas vezes é impraticável gravar rosbag que consistem em todos os
+    tópicos.
+  • O comando rosbag suporta a gravação de apenas determinados tópicos em um rosbag,
+    permitindo aos usuários registrar apenas os tópicos de seu interesse.
+
+    $ >>rosbag record -O subset /turtle1/cmd vel /turtle1/pose
+
+
+
+
+    Robot Operating System                                                          131 / 144
+                         Servidor de parâmetros
+
+
+
+
+Robot Operating System                             132 / 144
+O que é o servidor de parâmetros?
+
+
+
+  • Um servidor de parâmetros é um dicionário compartilhado que pode ser acessado por
+    meio de APIs de rede
+  • Os nós usam esse servidor para armazenar e recuperar parâmetros em tempo de
+    execução
+  • Como não foi projetado para alto desempenho, é melhor usado para dados estáticos,
+    como parâmetros de configuração
+  • Ele pode ser visualizado globalmente para que as ferramentas possam inspecionar
+    facilmente o estado de configuração do sistema e modificá-lo, se necessário
+
+
+
+
+    Robot Operating System                                                         133 / 144
+Tipos de parâmetros e nomes
+  • Tipos de parâmetros
+      •   32-bit integers
+      •   booleans
+      •   strings
+      •   doubles
+      •   iso8601 dates
+      •   lists
+      •   base64-encoded binary data
+  • Os parâmetros são nomeados usando a convenção de nomenclatura normal do ROS
+
+    $ /camera/left/name:     leftcamera
+    $ /camera/left/exposure:      1
+    $ /camera/right/name:     rightcamera
+    $ /camera/right/exposure:      1.1
+
+    Robot Operating System                                                      134 / 144
+rosparam
+
+
+ • rosparam permite a configuração e obtenção de parâmetros, bem como carregar e
+   despejar o estado do Parameter Server em um arquivo
+
+   $ rosparam set # definir par^
+                               ametro
+   $ rosparam get # obter par^
+                             ametro
+   $ rosparam load # carregar par^
+                                 ametros do arquivo
+   $ rosparam dump # despejar par^
+                                 ametros para arquivo
+   $ rosparam delete # excluir par^
+                                  ametro
+   $ rosparam list # listar nomes de par^
+                                        ametros
+
+
+
+
+   Robot Operating System                                                           135 / 144
+Formato YAML
+
+
+ • YAML é uma linguagem leve que suporta todos os tipos de parâmetros
+ • Os parâmetros podem ser definidos em arquivos codificados em YAML
+
+   $ string:     ’foo’
+   $ integer:     1234
+   $ float:     1234.5
+   $ boolean:     true
+   $ list:    [1.0, mixed list]
+   $ dictionary:       a:   b, c:   d
+
+
+
+
+   Robot Operating System                                                 136 / 144
+Os parâmetros em um nó
+
+  • Obter os parâmetros:
+    rospy.get param(param name)
+
+   $ name = rospy.get param("/name")
+   $ default param = rospy.get param(’default param’, ’default value’)
+
+  • Configurar os parâmetros:
+    rospy.set param(param name, param value)
+
+   $ rospy.set param(’a string’, ’baz’)
+   $ rospy.set param(’list of floats’, [1., 2., 3., 4.])
+   $ rospy.set param(’bool True’, True)
+   $ rospy.set param(’gains’, ’p’:   1, ’i’:   2, ’d’:   3)
+
+    Robot Operating System                                               137 / 144
+Os parâmetros em um nó - 2
+
+  • Existência do parâmetro:
+    rospy.has param(param name)
+
+   $ if rospy.has param(’to delete’):
+   $        rospy.delete param(’to delete’)
+
+  • Excluindo parâmetros:
+    rospy.delete param(param name)
+
+   $ try:
+   $        rospy.delete param(’to delete’)
+   $ except KeyError:
+   $        print("value not set")
+
+    Robot Operating System                    138 / 144
+                         roslaunch
+
+
+
+
+Robot Operating System               139 / 144
+O que é o roslaunch?
+
+  • roslaunch é uma ferramenta para:
+      • Iniciar facilmente vários nós ROS, localmente e remotamente via SSH
+      • Definir parâmetros no Parameter Server
+      • Redefinir nomes de nó e dos tópicos (remaping)
+  • roslaunch recebe um ou mais arquivos de configuração XML (com a extensão
+    .launch) que especificam os parâmetros a serem definidos e os nós a serem executados,
+    bem como as máquinas nas quais eles devem ser executados
+  • O pacote roslaunch contém as ferramentas roslaunch, que lêem o formato roslaunch
+    .launch/XML. Ele também contém uma variedade de outras ferramentas de suporte
+    para ajudá-lo a usar esses arquivos
+  • Um roslaunch iniciará automaticamente o roscore se detectar que ainda não está
+    em execução
+
+
+    Robot Operating System                                                            140 / 144
+Executar roslaunch
+
+ • Muitos pacotes ROS vêm com arquivos roslaunch, localizados em um diretório
+   launch do pacote
+ • Comando para executar um arquivo roslaunch:
+
+   $ roslaunch <package-name> <launch-filename> [args]
+
+ • Exemplo
+
+   $ roslaunch roslaunch example.launch
+
+ • O roslaunch instancia automaticamente um roscore se não existir quando o
+   roslaunch é chamado.
+ • O roslaunch fecha todos os seus nós quando Ctrl-C é pressionado no console que
+   contém o roslaunch.
+   Robot Operating System                                                         141 / 144
+roslaunch básico
+
+  • Exemplo: talker listener.launch
+
+    $ <launch>
+    $         <node name="talker"        pkg="rospy tutorials"
+    $                 type="talker.py"       output="screen"/>
+    $         <node name="listener"         pkg="rospy tutorials"
+    $                 type="listener.py"       output="screen"/>
+    $ </launch>
+
+  • Cada tag <node> inclui atributos:
+        •   Nome do nó no gráfico ROS.
+        •   O pacote em que pode ser encontrado.
+        •   O tipo de nó, que é simplesmente o nome do arquivo do programa executável.
+        •   Saı́das para o console atual.
+    Robot Operating System                                                                  142 / 144
+roslaunch com parâmetros
+
+
+
+   $ <launch>
+   $        <rosparam file="path/file.yaml" command="load"/>
+   $        <node name="talker"     pkg="rospy tutorials"
+   $                 type="talker.py"    output="screen"/>
+   $        <node name="listener"       pkg="rospy tutorials"
+   $                 type="listener.py"    output="screen"/>
+   $ </launch>
+
+
+
+
+    Robot Operating System                                      143 / 144
+roslaunch com remapeamento de tópico
+
+
+   $ <launch>
+   $       <rosparam file="path/file.yaml" command="load"/>
+   $       <node name="talker"     pkg="rospy tutorials"
+   $                type="talker.py"    output="screen"/>
+   $       <node name="listener"       pkg="rospy tutorials"
+   $                type="listener.py"    output="screen"/>
+   $                <remap from="topic1" to="topic2"/>
+   $       </node>
+   $ </launch>
+
+
+
+   Robot Operating System                                      144 / 144
